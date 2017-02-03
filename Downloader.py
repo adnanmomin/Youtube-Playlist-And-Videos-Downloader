@@ -36,7 +36,20 @@ def start(save, playlistName, type):
 def download(downloadUrl, value):
 
     if value == 1:
-        playlist = urllib.urlopen(downloadUrl)
+        driver = webdriver.Firefox()
+        driver.get(downloadUrl)
+
+        response = driver.find_element_by_id('pl-video-list')
+        try:
+            load = response.find_element_by_xpath('//button[contains(@aria-label,"Load more")]')
+            sleep(5)
+            load.click()
+        except NoSuchElementException:
+            ""
+        sleep(10)
+
+        playlist = driver.execute_script("return document.getElementsByTagName('body')[0].innerHTML")
+        driver.quit()
         content = BeautifulSoup(playlist, "html.parser")
         title = content.find_all('td', class_='pl-video-title')
         playlistName = content.find('h1', class_='pl-header-title').text.strip()
